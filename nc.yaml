@@ -1,0 +1,29 @@
+runtime: php55
+api_version: 1
+
+handlers:
+- url: /static
+  static_dir: static
+
+- url: /stylesheets
+  static_dir: stylesheets
+
+- url: /js/nc.js
+  script: /js/nc.js
+  
+- url: /js/timeKeep.js
+  script: /js/timeKeep.js
+
+- url: /ncMenu.php
+  script: /ncMenu.php
+  
+- url: /ncLog.php
+  script: /ncLog.php
+
+- url: /ncTransaction.php
+  script: /ncTransaction.php
+
+- url: /timeKeep.html
+  script: /timeKeep.html
+- url: /.*
+  script: /ncMain.html
