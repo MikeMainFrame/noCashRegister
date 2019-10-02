@@ -5,13 +5,12 @@
   zcanvas.addEventListener('click', clickProcessing, false);
 
   getMenuChartData();
-
-  newTransaction();
   
   async function getMenuChartData () {
-    renderDataAsButtons(await getMenuData());
-  }
 
+    renderDataAsButtons(await getMenuData());
+
+  }
   function getMenuData() {
 
     return new Promise(function (continueWith) {
@@ -21,13 +20,13 @@
       xhr.send();
     });
   }
-
   function renderDataAsButtons(choices) {
 
     zbuttons.appendChild(menuChartButtons(choices));
 
-  }
+    newTransaction();
 
+  }
   function menuChartButtons(choices) {
 
     var x = 30, y = -250;
@@ -97,8 +96,6 @@
       return g;
     }
   }
-
-
   function clickProcessing(scope) {
 
          if (scope.target.hasAttribute("zprice")) adjustOrder(scope)
@@ -110,11 +107,10 @@
     else if (scope.target.hasAttribute("zdate")) chooseDate(scope);
     else if (scope.target.hasAttribute("zclose")) closeWindow();
   }
-
-
   function newTransaction () {
   
-    ztrx.textContent = new timerSeconds("zcounter").start().getTime();
+    ztrx.textContent = new timerSeconds("zcounter").start().getTime();    
+    zdate.textContent = date99XXX9999(new Date());
 
     document.querySelectorAll(".order").forEach((button) => button.setAttribute('opacity', 0.3))
     document.querySelectorAll(".quantity").forEach((order) => order.textContent = "");
@@ -123,23 +119,17 @@
     mirrorOrderLines();
     
   }
-
-
   function chooseDate (what) {
 
-    zdate.textContent = what.getAttribute("zdate");
+    zdate.textContent = what.target.getAttribute("zdate");
     zdates.parentNode.removeChild(zdates);
     
   }
-
-
   function closeWindow () {
 
     zlog.parentNode.removeChild(zlog);
 
   }
-
-
   function adjustOrder (scope) {
 
     var ix = scope.target.getAttribute('zindex');
@@ -157,8 +147,6 @@
     mirrorOrderLines();
 
   }
-
-
   function toogleFactor () {
 
     zfactor = zfactor * -1;
@@ -170,8 +158,6 @@
     zaddsub.setAttribute("zfactor", temp);
 
   }
-
-
   function mirrorOrderLines () {
 
     if (typeof zsummary !== 'undefined') zsummary.parentNode.removeChild(zsummary);
@@ -226,8 +212,6 @@
     g.appendChild(text);
     zcanvas.appendChild(g);
   }
-
-
   function dispatchTransaction() {
 
     var transaction = document.implementation.createDocument("", "", null);
@@ -257,8 +241,6 @@
     xhr.open("POST", "ncTransaction.php");
     xhr.send(transaction);
   }
-
-
   function historcalDates() {
 
     var xhr = new XMLHttpRequest();
@@ -275,13 +257,11 @@
     xhr.open("GET", "ncLog.php");
     xhr.send();
   }
-
-
   function presentCalendar() {
 
     var more = true, ix = 0, x = 0, y = 0;
     
-    var zDate = new Date(zDate.setFullYear(zDate.getFullYear() + 1),0,1);
+    var zDate = new Date(); zDate.setMonth(0); zDate.setDate(1);
 
     var g = document.createElementNS(svgns, 'g');
     g.setAttribute("id", 'zdates');
@@ -307,7 +287,7 @@
       rect.setAttribute("rx", 15);
       rect.setAttribute("fill", "#fff");
       rect.setAttribute("opacity", 0.3);
-      rect.setAttribute("zdate", date99XXX9999(thisDate.toString()));
+      rect.setAttribute("zdate", date99XXX9999(zDate));
 
       g.appendChild(rect);
 
@@ -315,7 +295,7 @@
       text.setAttribute("x", x + 150);
       text.setAttribute("y", y + 47);
       text.setAttribute("fill", '#fff');
-      text.textContent = date99XXX9999(thisDate);
+      text.textContent = date99XXX9999(zDate);
 
       g.appendChild(text);
 
@@ -323,7 +303,6 @@
     }
     zcanvas.appendChild(g);
   }
-
   function date99999999 (d) {
     return parseInt((d.getFullYear() * 1E4) + ((d.getMonth() + 1) * 1E2) + d.getDate())
   }
@@ -332,5 +311,4 @@
     + "JANFEBMARAPRMAJJUNJULAUGSEPOCTNOVDEC".substr((dateO.getMonth() * 3), 3) 
     + dateO.getFullYear(); 
   }
-
 })();
