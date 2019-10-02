@@ -1,21 +1,19 @@
 (function main() {
 
-  var zfactor = 1;
-  var now = new timerSeconds("zcounter"); 
-
-  zdate.textContent = ddMMMyyyy(now);    
-  zcanvas.addEventListener('click', handleClick, false);
+  var zfactor = 1 ; svgns = "http://www.w3.org/2000/svg"; 
+  
+  zcanvas.addEventListener('click', clickProcessing, false);
 
   getMenuChartData();
+
   newTransaction();
-
-  return;
-
-  async function getMenuChartData() {
-    renderDataAsButtons(await xhrServer());
+  
+  async function getMenuChartData () {
+    renderDataAsButtons(await getMenuData());
   }
 
-  function xhrServer() {
+  function getMenuData() {
+
     return new Promise(function (continueWith) {
       var xhr = new XMLHttpRequest();
       xhr.onreadystatechange = () => { if (xhr.readyState === 4) continueWith(JSON.parse(xhr.responseText))};
@@ -25,34 +23,36 @@
   }
 
   function renderDataAsButtons(choices) {
-    document.getElementById('zbuttons').appendChild(menuChartButtons(choices));
+
+    zbuttons.appendChild(menuChartButtons(choices));
+
   }
 
   function menuChartButtons(choices) {
 
     var x = 30, y = -250;
 
-    var buttons = document.createElementNS("http://www.w3.org/2000/svg", 'g');
+    var buttons = document.createElementNS(svgns, 'g');
     buttons.setAttribute("fill", '#fff');
     buttons.setAttribute("font-size", 36);
     buttons.setAttribute("text-anchor", 'middle');
-
-    for (ix = 0; ix < choices.length; ix++) {
+    
+    choices.map((choice, ix) => {  
       if ((ix % 8 === 0) && ix > 0) {
         x = x + 450;
         y = 50;
       } else y = y + 300;
-      buttons.appendChild(buttonRender(x, y, choices[ix].name, choices[ix].price, ix, "#fff"));
-    }
+      buttons.appendChild(buttonRender(x, y, choice.name, choice.price, ix, "#fff"));
+    })
 
     return buttons;
 
     function buttonRender(x, y, name, price, index, color) {
 
-      var g = document.createElementNS("http://www.w3.org/2000/svg", 'g');
+      var g = document.createElementNS(svgns, 'g');
       g.setAttribute("transform", "translate(" + x + "," + y + ")");
 
-      var rect = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
+      var rect = document.createElementNS(svgns, 'rect');
       rect.setAttribute("class", "order")
       rect.setAttribute("x", 0);
       rect.setAttribute("y", 0);
@@ -67,7 +67,7 @@
 
       g.appendChild(rect);
 
-      var text = document.createElementNS("http://www.w3.org/2000/svg", 'text');
+      var text = document.createElementNS(svgns, 'text');
       text.setAttribute("x", 30);
       text.setAttribute("y", 50);
       text.setAttribute("text-anchor", 'start');
@@ -75,7 +75,7 @@
 
       g.appendChild(text);
 
-      text = document.createElementNS("http://www.w3.org/2000/svg", 'text');
+      text = document.createElementNS(svgns, 'text');
       text.setAttribute("class", "quantity")
       text.setAttribute("x", 200);
       text.setAttribute("y", 144);
@@ -86,7 +86,7 @@
 
       g.appendChild(text);
 
-      text = document.createElementNS("http://www.w3.org/2000/svg", 'text');
+      text = document.createElementNS(svgns, 'text');
       text.setAttribute("x", 370);
       text.setAttribute("y", 220);
       text.setAttribute("text-anchor", 'end');
@@ -99,72 +99,84 @@
   }
 
 
-  function handleClick(evt) {
+  function clickProcessing(scope) {
 
-    var scope = evt.target;
-
-    if (scope.hasAttribute("zprice")) adjustItem(scope)
-    else if (scope.hasAttribute("zfactor")) toogleFactor(scope);
-    else if (scope.hasAttribute("zlog")) viewLog();
-    else if (scope.hasAttribute("znew")) newTransaction();
-    else if (scope.hasAttribute("zfinal")) wrapUp();
-    else if (scope.hasAttribute("zdates")) subDates();
-    else if (scope.hasAttribute("zdate")) datePick(scope);
-    else if (scope.hasAttribute("zclose")) closeW(scope);
+         if (scope.target.hasAttribute("zprice")) adjustOrder(scope)
+    else if (scope.target.hasAttribute("zaddsub")) toogleFactor();
+    else if (scope.target.hasAttribute("zsurvey")) historcalDates();
+    else if (scope.target.hasAttribute("zclear")) newTransaction();
+    else if (scope.target.hasAttribute("zfinal")) dispatchTransaction();
+    else if (scope.target.hasAttribute("zdates")) presentCalendar();
+    else if (scope.target.hasAttribute("zdate")) chooseDate(scope);
+    else if (scope.target.hasAttribute("zclose")) closeWindow();
   }
 
 
-  function newTransaction() {
-    ztrx.textContent = (new Date()).toISOString();
-    document.querySelectorAll(".quantity").forEach((button) => button.textContent = "");
+  function newTransaction () {
+  
+    ztrx.textContent = new timerSeconds("zcounter").start().getTime();
+
+    document.querySelectorAll(".order").forEach((button) => button.setAttribute('opacity', 0.3))
+    document.querySelectorAll(".quantity").forEach((order) => order.textContent = "");
+    document.querySelectorAll(".order").forEach((order) => order.removeAttribute("zquantity"));
+
+    mirrorOrderLines();
+    
   }
 
 
-  function datePick(what) {
+  function chooseDate (what) {
+
     zdate.textContent = what.getAttribute("zdate");
     zdates.parentNode.removeChild(zdates);
+    
   }
 
 
-  function closeW(scope) {
-    var name = scope.getAttribute("zclose");
-    var id = document.getElementById(name);
-    id.parentNode.removeChild(id);
+  function closeWindow () {
+
+    zlog.parentNode.removeChild(zlog);
+
   }
 
 
-  function adjustItem(scope) {
-    scope.setAttribute("opacity", 0.6);
-    var ix = scope.getAttribute('zindex');
+  function adjustOrder (scope) {
+
+    var ix = scope.target.getAttribute('zindex');
     var tally;
 
-    (scope.hasAttribute('zquantity'))
-      ?  tally = parseInt(scope.getAttribute("zquantity"))
-      :  tally = 0; 
+    (scope.target.hasAttribute('zquantity'))
+      ?  tally = zfactor + parseInt(scope.target.getAttribute("zquantity"))
+      :  tally = zfactor; 
 
-    scope.setAttribute("zquantity", tally = tally + zfactor);
+    scope.target.setAttribute("zquantity", tally);
     var temp = document.getElementById("c" + ix);
     temp.textContent = tally;
-    rebuildList();
+    if (tally > 0) scope.target.setAttribute("opacity", 0.6);
+
+    mirrorOrderLines();
+
   }
 
 
-  function toogleFactor() {
-    var temp = zaddsub.getAttribute("zfactor") * -1;
+  function toogleFactor () {
 
-    (temp === -1)
+    zfactor = zfactor * -1;
+
+    (zfactor === -1)
       ? zblitz.setAttribute("fill", "#a00")
       : zblitz.setAttribute("fill", "#666")
 
     zaddsub.setAttribute("zfactor", temp);
+
   }
 
 
-  function rebuildList() {
-    var execute = document.getElementById('zsummary');
-    if (execute) execute.parentNode.removeChild(execute);
+  function mirrorOrderLines () {
 
-    var g = document.createElementNS("http://www.w3.org/2000/svg", 'g');
+    if (typeof zsummary !== 'undefined') zsummary.parentNode.removeChild(zsummary);
+
+    var g = document.createElementNS(svgns, 'g');
     g.setAttribute("id", 'zsummary');
     g.setAttribute("fill", '#fff');
     g.setAttribute("font-size", 54);
@@ -173,7 +185,7 @@
 
     document.querySelectorAll(".order[zquantity]").forEach((order) => {
 
-      var text = document.createElementNS("http://www.w3.org/2000/svg", 'text');
+      var text = document.createElementNS(svgns, 'text');
       text.setAttribute("text-anchor", 'end');
       text.setAttribute("x", 2800);
       text.setAttribute("y", y);
@@ -181,7 +193,7 @@
 
       g.appendChild(text);
 
-      text = document.createElementNS("http://www.w3.org/2000/svg", 'text');
+      text = document.createElementNS(svgns, 'text');
       text.setAttribute("text-anchor", 'start');
       text.setAttribute("x", 2830);
       text.setAttribute("y", y);
@@ -189,7 +201,7 @@
 
       g.appendChild(text);
 
-      text = document.createElementNS("http://www.w3.org/2000/svg", 'text');
+      text = document.createElementNS(svgns, 'text');
       text.setAttribute("text-anchor", 'end');
       text.setAttribute("x", 3950);
       text.setAttribute("y", y);
@@ -202,7 +214,7 @@
 
     })
   
-    var text = document.createElementNS("http://www.w3.org/2000/svg", 'text');
+    var text = document.createElementNS(svgns, 'text');
     text.setAttribute("text-anchor", 'end');
     text.setAttribute("font-weight", 900);
     text.setAttribute("font-size", 96);
@@ -216,7 +228,7 @@
   }
 
 
-  function wrapUp() {
+  function dispatchTransaction() {
 
     var transaction = document.implementation.createDocument("", "", null);
 
@@ -234,27 +246,27 @@
 
     transaction.appendChild(zDay);
 
-    var xmlhttp = new XMLHttpRequest();
+    var xhr = new XMLHttpRequest();
 
-    xmlhttp.onreadystatechange = () => {
-      if (xmlhttp.readyState === 4) {
-        zmessage.textContent = xmlhttp.responseText;
+    xhr.onreadystatechange = () => {
+      if (xhr.readyState === 4) {
+        zmessage.textContent = xhr.responseText;
         newTransaction();
       }
     };
-    xmlhttp.open("POST", "ncTransaction.php");
-    xmlhttp.send(transaction);
+    xhr.open("POST", "ncTransaction.php");
+    xhr.send(transaction);
   }
 
 
-  function viewLog() {
+  function historcalDates() {
 
     var xhr = new XMLHttpRequest();
 
     xhr.onreadystatechange = () => {
       if (xhr.readyState === 4) {
-        zstatistic.parentNode.removeChild(zstatistic);
-        var g = document.createElementNS("http://www.w3.org/2000/svg", 'g');
+        if (typeof zstatistic !== 'undefined') zstatistic.parentNode.removeChild(zstatistic);        
+        var g = document.createElementNS(svgns, 'g');
         g.setAttribute("id", "zstatistic");
         g.innerHTML = xhr.responseText;
         zcanvas.appendChild(g);
@@ -265,12 +277,13 @@
   }
 
 
-  function subDates() {
+  function presentCalendar() {
 
     var more = true, ix = 0, x = 0, y = 0;
-    var zDate = new Date(); zDate.setFullYear(zDate.getFullYear() + 1); zDate.setMonth(0); zDate.setDate(1);
+    
+    var zDate = new Date(zDate.setFullYear(zDate.getFullYear() + 1),0,1);
 
-    var g = document.createElementNS("http://www.w3.org/2000/svg", 'g');
+    var g = document.createElementNS(svgns, 'g');
     g.setAttribute("id", 'zdates');
     g.setAttribute("fill", '#fff');
     g.setAttribute("font-size", 28);
@@ -283,9 +296,10 @@
 
       x = (zDate.getMonth() * 333) + 1;
       y = (zDate.getDate() * 87) + 1;
-      var thisDate = parseInt((zDate.getFullYear() * 1E4) + ((zDate.getMonth() + 1) * 1E2) + zDate.getDate());
 
-      var rect = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
+      var thisDate = date99999999(zDate);
+
+      var rect = document.createElementNS(svgns, 'rect');
       rect.setAttribute("x", x);
       rect.setAttribute("y", y);
       rect.setAttribute("width", 300);
@@ -293,15 +307,15 @@
       rect.setAttribute("rx", 15);
       rect.setAttribute("fill", "#fff");
       rect.setAttribute("opacity", 0.3);
-      rect.setAttribute("zdate", ddMMMyyyy(thisDate.toString()));
+      rect.setAttribute("zdate", date99XXX9999(thisDate.toString()));
 
       g.appendChild(rect);
 
-      var text = document.createElementNS("http://www.w3.org/2000/svg", 'text');
+      var text = document.createElementNS(svgns, 'text');
       text.setAttribute("x", x + 150);
       text.setAttribute("y", y + 47);
       text.setAttribute("fill", '#fff');
-      text.textContent = ddMMMyyyy(thisDate.toString());
+      text.textContent = date99XXX9999(thisDate);
 
       g.appendChild(text);
 
@@ -310,10 +324,13 @@
     zcanvas.appendChild(g);
   }
 
-
-  function ddMMMyyyy(dateO) {
+  function date99999999 (d) {
+    return parseInt((d.getFullYear() * 1E4) + ((d.getMonth() + 1) * 1E2) + d.getDate())
+  }
+  function date99XXX9999(dateO) {
     return dateO.getDate() 
     + "JANFEBMARAPRMAJJUNJULAUGSEPOCTNOVDEC".substr((dateO.getMonth() * 3), 3) 
     + dateO.getFullYear(); 
   }
+
 })();
