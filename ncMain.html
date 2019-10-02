@@ -2,33 +2,33 @@
 
 <head>
 	<meta charset="utf-8">
-	<title>noCashRegister :: by Michael Kenneth Rasch :: TRITICUM</title>
+	<title>noCashRegister :: TRITICUM :: by Michael K Rasch</title>
+	<link href="https://storage.cloud.google.com/ncdatabase/revenue.png" rel="icon" />	
 	<link href="https://fonts.googleapis.com/css?family=Scope+One" rel="stylesheet" />
-	<link href="./nc.css" rel="stylesheet" />
-	<link href="https://storage.googleapis.com/nocashregister/revenue.png" rel="icon" />
 </head>
 
-<body id="zBody">
-	<div style="margin: 0">
-		<svg viewBox="0 0 4400 2400" id="zcanvas" version="1.1" xmlns="http://www.w3.org/2000/svg">
-			<g id="buttons">
+<body id="zBody" style="
+	background: #0E5EADFF;
+	margin: 0 ;
+	color: #fff ; 
+	font-family: 'Scope One', sans-serif;
+	">
+	<div style="
+	margin: 0
+	">
+		<svg id="zcanvas" viewBox="0 0 4400 2400"  version="1.1" xmlns="http://www.w3.org/2000/svg">
+			<g id="zbuttons">
 				<g fill="#fff" text-anchor="start" font-weight="700" font-size="72" stroke-width="3">
-
 					<rect x="4072" y="50" width="200" height="2350" stroke="#fff" fill="none" rx="10"></rect>
-
-					<image x="4100" y="100" width="144" height="144" zfinal="true" href="static/done.svg"></image>
-					<image x="4100" y="300" width="144" height="144" zdates="true" href="static/dates.svg"></image>
-					<image x="4100" y="500" width="144" height="144" zfactor="1" href="static/addSub.svg" id="addSub">
-					</image>
-					<image x="4100" y="700" width="144" height="144" zlog="true" href="static/week.svg"></image>
-					<image x="4100" y="900" width="144" height="144" znew="true" href="static/addTrx.svg"></image>
-
+					<image x="4100" y="100" width="144" height="144" zfinal href="static/done.svg"></image>
+					<image x="4100" y="300" width="144" height="144" zdates href="static/dates.svg"></image>
+					<image x="4100" y="500" width="144" height="144" zaddsub href="static/addSub.svg" ></image>
+					<image x="4100" y="700" width="144" height="144" zsurvey href="static/week.svg"></image>
+					<image x="4100" y="900" width="144" height="144" zclear href="static/addTrx.svg"></image>
 					<svg viewBox="0 0 2000 2000" x="2750" y="1600" width="700" height="700" id="zcounter"></svg>
-
 					<text x="2710" y="2380" id="zmessage">we are good</text>
 					<text x="4320" y="80" id="zdate" transform="rotate(90 4320 80)">20MAY2021</text>
 					<text x="4320" y="500" id="ztrx" transform="rotate(90 4320 500)">#2019031210001</text>
-
 				</g>
 				<g transform="translate(2750,50)">
 					<path id="zblitz"
@@ -36,9 +36,8 @@
 						fill="#666" stroke="none" />
 				</g>
 			</g>
-
-			<script href="js/timeKeep.js"></script>
-			<script href="js/nc.js"></script>
+			<script href="static/timeKeep.js"></script>
+			<script href="static/nc.js"></script>
 		</svg>
 	</div>
 </body>
