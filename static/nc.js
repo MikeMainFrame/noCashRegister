@@ -142,6 +142,7 @@
     scope.target.setAttribute("zquantity", tally);
     var temp = document.getElementById("c" + ix);
     temp.textContent = tally;
+    
     if (tally > 0) scope.target.setAttribute("opacity", 0.6);
 
     mirrorOrderLines();
